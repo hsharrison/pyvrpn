@@ -1,6 +1,6 @@
-===============================
-pyvrpn
-===============================
+============
+pyvrpn [WIP]
+============
 
 High-level Python interface between the `VRPN`_ project and `pyglet`_.
 
