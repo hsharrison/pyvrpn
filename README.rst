@@ -36,14 +36,14 @@ High-level Python interface between the `VRPN`_ project and `pyglet`_.
 This package provides a pure-Python interface to the `VRPN`_ library, for interfacing with virtual reality hardware.
 Whereas existing Python bindings for `VRPN`_  only interface with the client side, ``pyvrpn`` allows the user to start and stop the server process, dynamically constructing the server configuration based on the receivers that are in use.
 
-`pyvrpn`_ implements receivers as subclasses of `pyglet`_ `event dispatchers`_.
+``pyvrpn`` implements receivers as subclasses of `pyglet`_ `event dispatchers`_.
 They dispatch an event called ``on_receiver_input`` when new data is received.
 Register an event handler for this event to respond to incoming receiver data.
 
 Installation
 ============
 
-Only Python versions >= 3.3 is supported.
+Only Python versions >= 3.4 is supported.
 Installing with ``pip`` is recommended::
 
     pip install pyvrpn --upgrade
@@ -54,6 +54,8 @@ It can be installed from source from its Mercurial repository at ``http://code.g
 
 Additionally, the `VRPN`_ library is required, as is its included low-level Python interface (the one in the ``python`` directory, not the ``vrpn_python`` directory).
 This dependency has been conveniently packaged as a `conda`_ environment, under the name ``vrpn``, and uploaded to the `binstar`_ channel ``hharrison``.
+
+Finally, the Python package `toolz`_ or its Cythonized stand-in `cytoolz`_ is required.
 
 The easiest way to install `conda`_ is with `Miniconda`_.
 From there, the following will create a new ``conda`` environment named ``'vr'`` and install Python 3.4, ``vrpn``, ``pyglet``, and ``pyvrpn``::
@@ -92,3 +94,5 @@ To run the all tests run::
 .. _build recipe: https://bitbucket.org/hharrison/conda-vrpn-recipe
 .. _pyglet: http://www.pyglet.org/
 .. _event dispatchers: http://www.pyglet.org/doc-current/programming_guide/events.html#creating-your-own-event-dispatcher
+.. _cytoolz: https://github.com/pytoolz/cytoolz
+.. _toolz: http://toolz.readthedocs.org/en/latest/
