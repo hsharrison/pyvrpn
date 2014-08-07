@@ -126,11 +126,10 @@ class Server:
     .. _here: http://python-notes.curiousefficiency.org/en/latest/pep_ideas/async_programming.html#asynchronous-context-managers
 
     """
-    def __init__(self, devices_config_text, server_args=None, sentinel=None, timeout=None, sleep=0, loop=None, _exe=None):
+    def __init__(self, devices_config_text, server_args=None, sentinel=None, sleep=0, loop=None, _exe=None):
         self.devices_config_text = devices_config_text
         self.server_args = server_args
         self.sentinel = sentinel
-        self.timeout = timeout
         self.sleep = sleep
         self.loop = loop
 
@@ -212,7 +211,7 @@ class Server:
                         monitor_feed(
                             _check_for_pattern(re.compile(self.sentinel), log_func=info),
                             decoded_readline(self.process.stdout)),
-                        self.timeout, loop=self.loop
+                        None, loop=self.loop
                     )
                 debug('running coroutine monitor_feed with asyncio.async')
                 self.monitor_tasks['stdout'] = asyncio.async(
