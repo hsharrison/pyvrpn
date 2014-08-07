@@ -1,5 +1,6 @@
 from subprocess import PIPE
 import re
+import os
 from functools import partial
 from tempfile import NamedTemporaryFile
 import logging
@@ -132,7 +133,9 @@ class Server:
         self.timeout = timeout
         self.sleep = sleep
         self.loop = loop
+
         self._exe = _exe or SERVER_CMD_ARGS
+        self._config_file = None
 
         self.process = None
         self.started_at = None
@@ -165,7 +168,8 @@ class Server:
         if self.is_running:
             raise RuntimeError("Cannot start a Server that's already is_running")
 
-        with NamedTemporaryFile('w') as config_file:
+        with NamedTemporaryFile('w', delete=False) as config_file:
+            self._config_file = config_file
             config_file.writelines([
                 '# VRPN server configuration file.\n',
                 '# Automatically created by pyvrpn.server.Server.\n',
@@ -278,6 +282,9 @@ class Server:
             debug('yielding from coroutine Server.process.wait')
             exitcode = yield from self.process.wait()
             debug('exit code: {}'.format(exitcode))
+
+            os.unlink(self._config_file.name)
+
             return exitcode
 
         else:
