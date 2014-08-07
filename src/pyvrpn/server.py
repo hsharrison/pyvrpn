@@ -7,7 +7,6 @@ import asyncio
 import inspect
 import traceback
 from datetime import datetime
-import threading
 
 try:
     import cytoolz as toolz
@@ -324,8 +323,6 @@ class _ContextManager:
         debug('inside _ContextManager.__exit__')
         try:
             debug('running coroutine Server.stop with asyncio.async')
-            lock = threading.Lock()
-            lock.acquire()
             asyncio.async(self._server.stop(*exc_args), loop=self._server.loop)
         finally:
             self._server = None  # Crudely prevent reuse.
