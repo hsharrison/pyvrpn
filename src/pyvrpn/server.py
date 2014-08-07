@@ -55,7 +55,30 @@ def _iscoroutinefunction(func):
 
 
 class Server:
-    """Context manager for is_running a VRPN server process.
+    """Asynchronous wrapper for VRPN server process.
+
+    It's important to always stop the server.
+    To that end, it can be used as a coroutine context manager::
+
+        with (yield from pyvrpn.Server(devices_text, sentinel='ready')) as server:
+                ...
+                ...
+
+    or make sure it closes the old-fashioned way::
+
+        server = pyvrpn.Server(devices_text, sentinel='ready')
+        yield from server.start()
+
+        try:
+            ...
+            ...
+
+        finally:
+            yield from server.stop()
+
+    As long as the server process is running,
+    the process's stdout will be logged at the INFO level,
+    and stderr will be logged at the ERROR level.
 
     Parameters
     ---------
@@ -73,9 +96,34 @@ class Server:
     loop : |asyncio.EventLoop|, optional
         The event loop to schedule tasks with.
 
-    Returns
-    -------
-    |asyncio.subprocess.Process|
+    Attributes
+    ----------
+    device_config_text : iterable
+    server_args : sequence
+    sentinel : str
+    sleep : int
+    loop : |asyncio.EventLoop|
+    proc : |asyncio.subprocess.Process|
+        The process running the ``vrpn_server`` executable.
+    started_at : |datetime.datetime|
+        The time when the server completed initialization.
+    monitor_tasks : dict of str to |asyncio.Task|
+        Contains two tasks, one that monitors the stdout of `proc` and one that monitors its stderr.
+    is_running : bool
+        Returns True if the server is running.
+    time : float
+        Number of seconds since `started_at`.
+
+    Notes
+    -----
+
+    Due to limits of |asyncio| that are nicely summarized `here`_,
+    the ``__exit__`` method (i.e. the stopping of the server at the end of the ``with`` block) cannot block.
+    This means that the server process  will still be running
+    for another fraction of a second after the ``with`` statement closes.
+    For most use cases, this should not matter.
+
+    .. _here: http://python-notes.curiousefficiency.org/en/latest/pep_ideas/async_programming.html#asynchronous-context-managers
 
     """
     def __init__(self, devices_config_text, server_args=None, sentinel=None, timeout=None, sleep=0, loop=None, _exe=None):
@@ -105,6 +153,15 @@ class Server:
 
     @asyncio.coroutine
     def start(self):
+        """Start the server asynchronously.
+
+        |Server.start| returns after
+        (1) the |sentinel| attribute (if given) is matched in the server's stdout, followed by
+        (2) a number of seconds given by the |sleep| attribute.
+
+        This method is a |coroutine|.
+
+        """
         # Don't run multiple servers from the same instance.
         if self.is_running:
             raise RuntimeError("Cannot start a Server that's already is_running")
@@ -179,6 +236,35 @@ class Server:
 
     @asyncio.coroutine
     def stop(self, exc_type=None, exc_value=None, exc_tb=None, kill=False):
+        """Stop the server asynchronously.
+
+        The monitoring tasks stored in |Server.monitor_tasks| will be canceled,
+        then a SIGTERM or SIGKILL signal will be sent to the server process.
+
+        The first three inputs are the same as used for a context manager's |__exit__| method,
+        and provide information about an exception.
+        If the server is being stopped due to an exception,
+        information about the exception can be passed in and it will be logged before killing the process.
+
+        This method is a |coroutine|.
+
+        Parameters
+        ----------
+        exc_type : type, optional
+            The exception type, if the server is being stopped due to an exception.
+        exc_value : str, optional
+            The value passed to the exception.
+        exc_tb : |traceback|, optional
+            The exception traceback.
+        kill : bool, optional
+            If True, send SIGKILL instead of SIGTERM.
+
+        Returns
+        -------
+        int
+            The exit code of the process.
+
+        """
         if not self.is_running:
             raise RuntimeError("Cannot stop a Server that isn't is_running")
 
@@ -251,6 +337,8 @@ def monitor_feed(monitor, feed):
     When the function raises |StopIteration|, the coroutine returns.
     The coroutine will also return if an empty line is encountered.
     Therefore, this works best with methods like ``readline()`` that always include a newline.
+
+    This function is a |coroutine|.
 
     Parameters
     ----------
