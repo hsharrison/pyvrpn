@@ -141,6 +141,15 @@ def test_startup_time(loop):
 
 
 @async_test
+def test_startup_sleep(loop):
+    server, time = yield from startup_time([], sleep=1, loop=loop)
+    assert server.is_running
+    assert 1 < time < 1.5
+    yield from server.stop()
+    assert not server.is_running
+
+
+@async_test
 def test_server_sentinel(loop):
     server, time = yield from startup_time(
         ['sentinel\n'],
