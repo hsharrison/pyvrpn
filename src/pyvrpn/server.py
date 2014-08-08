@@ -96,9 +96,7 @@ class Server:
 
             # Log the entire contents of the file.
             info('Temporary config file created at {} with contents:'.format(config_file.name))
-            with open(config_file.name, 'r') as temp_file:
-                for n, line in enumerate(temp_file):
-                    info('{}:{:02}:{}'.format(config_file.name, n + 1, line))
+            _log_file_contents(info, config_file.name)
 
             cmd_args = self._exe + [config_file.name]
             if self.server_args:
@@ -251,6 +249,12 @@ def monitor_feed(monitor, feed):
             monitor(line)
         except StopIteration:
             return
+
+
+def _log_file_contents(logger, path):
+    with open(path, 'r') as file:
+        for ix, line in enumerate(file):
+            logger('{}:{:02}:{}'.format(path, ix + 1, line))
 
 
 @toolz.curry
