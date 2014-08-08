@@ -2,9 +2,7 @@ from subprocess import PIPE
 import re
 from functools import partial
 from tempfile import NamedTemporaryFile
-import logging
 import asyncio
-import inspect
 import traceback
 from datetime import datetime
 import threading
@@ -14,36 +12,13 @@ try:
 except ImportError:
     import toolz
 
+from pyvrpn.logging import setup_module_logging
+
 
 SERVER_CMD_ARGS = ['vrpn_server', '-f']
 
 
-# Set up logging.
-_old_factory = logging.getLogRecordFactory()
-
-
-def _redirect_log_call_record_factory(*args, **kwargs):
-    # Because we're logging from a custom function,
-    # we should make the line numbers point to the call from the next frame in the stack.
-    record = _old_factory(*args, **kwargs)
-    frames = inspect.stack()
-    stack_no = next(i for i, frame in enumerate(frames) if frame[2] == record.lineno)
-    if frames[stack_no][3] == '_log_rstrip':
-        record.lineno = frames[stack_no + 1][2]
-    return record
-
-logging.setLogRecordFactory(_redirect_log_call_record_factory)
-module_logger = logging.getLogger(__name__)
-
-
-@toolz.curry
-def _log_rstrip(logger, level, line):
-    logger.log(level, str(line).rstrip())
-
-log = _log_rstrip(module_logger)
-debug = log(logging.DEBUG)
-info = log(logging.INFO)
-error = log(logging.ERROR)
+error, warning, info, debug = setup_module_logging(__name__)
 
 
 def _iscoroutinefunction(func):
