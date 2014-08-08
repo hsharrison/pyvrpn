@@ -219,6 +219,7 @@ class _ContextManager:
         finally:
             self._server = None  # Crudely prevent reuse.
 
+
 @asyncio.coroutine
 def monitor_feed(monitor, feed):
     """
