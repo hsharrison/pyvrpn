@@ -198,6 +198,48 @@ class Server:
         return _ContextManager(self)
 
 
+class LocalServer(Server):
+    """Local server.
+
+    A server that has direct access to devices and therefore can directly manage them.
+    The differences between |LocalServer| and |Server| are:
+      - |LocalServer| takes device objects directly, rather than just their config_text property.
+      - |LocalServer.start| will also connect the devices and schedule their |mainloop| methods to run regularly.
+
+    Parameters
+    ----------
+    devices : sequence of |Receiver|
+        VRPN devices to manage.
+    kwargs
+        Optional keyword arguments to pass to |Server|.
+
+    """
+    def __init__(self, devices, **kwargs):
+        super().__init__((device.config_text for device in devices), **kwargs)
+        self.devices = devices
+        self._mainloop_handle = None
+
+    @asyncio.coroutine
+    def _mainloop(self):
+        for device in self.devices:
+            if device.is_connected:
+                device.mainloop()
+        self.loop.call_soon(self._mainloop)
+        yield from asyncio.sleep(0)
+
+    @asyncio.coroutine
+    def start(self):
+        yield from super().start()
+        for device in self.devices:
+            device.connect()
+        self._mainloop_handle = self.loop.call_soon(self._mainloop())
+
+    @asyncio.coroutine
+    def stop(self, exc_type=None, exc_value=None, exc_tb=None, kill=False):
+        yield from super().stop(exc_type, exc_value, exc_tb, kill)
+        self._mainloop_handle.cancel()
+
+
 class _ContextManager:
     # See asyncio.locks._ContextManager.
     def __init__(self, server):
