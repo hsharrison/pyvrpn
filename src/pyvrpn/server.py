@@ -308,27 +308,26 @@ class LocalServer(Server):
     def __init__(self, devices, **kwargs):
         super().__init__((device.config_text for device in devices), **kwargs)
         self.devices = devices
-        self._mainloop_handle = None
+        self.mainloop_task = None
 
     @asyncio.coroutine
     def _mainloop(self):
-        for device in self.devices:
-            if device.is_connected:
-                device.mainloop()
-        self.loop.call_soon(self._mainloop)
-        yield from asyncio.sleep(0)
+        while True:
+            for device in self.devices:
+                if device.is_connected:
+                    device.mainloop()
+            yield from asyncio.sleep(0)
 
     @asyncio.coroutine
     def start(self):
         yield from super().start()
         for device in self.devices:
             device.connect()
-        self._mainloop_handle = self.loop.call_soon(self._mainloop())
+        self.mainloop_task = asyncio.async(self._mainloop(), loop=self.loop)
 
     @asyncio.coroutine
     def stop(self, exc_type=None, exc_value=None, exc_tb=None, kill=False):
         yield from super().stop(exc_type, exc_value, exc_tb, kill)
-        self._mainloop_handle.cancel()
 
 
 class _ContextManager:
