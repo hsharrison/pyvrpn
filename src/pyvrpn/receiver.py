@@ -125,6 +125,7 @@ class Receiver(pyglet.event.EventDispatcher, metaclass=abc.ABCMeta):
         else:
             self._object.register_change_handler('', self._callback)
 
+        info('{} connected to server'.format(self))
         self.connected = True
 
     def mainloop(self):
