@@ -189,6 +189,9 @@ class Sensor(pyglet.event.EventDispatcher):
     def __str__(self):
         return 'Sensor #{} of {}'.format(self.number, self._parent_str)
 
+    def __bool__(self):
+        return True
+
 
 class Tracker(Receiver):
     """Tracker receivers can derive from this instead of |Receiver|, and then don't have to override |object_class|.
