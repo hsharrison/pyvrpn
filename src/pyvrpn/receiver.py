@@ -110,6 +110,16 @@ class Receiver(pyglet.event.EventDispatcher, metaclass=abc.ABCMeta):
         return joiner.join(lines)
 
     def connect(self, host='localhost'):
+        """
+        Connect this device to a running server.
+
+        Parameters
+        ----------
+        host : str, optional
+            IP address of server.
+            Defaults to ``'localhost'``.
+
+        """
         if self.connected:
             raise RuntimeError('cannot connect a Receiver twice')
 
