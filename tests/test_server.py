@@ -192,8 +192,10 @@ def test_local_server(loop):
     with (yield from LocalServer([device])) as server:
         yield from asyncio.sleep(0.25)
         assert server.is_running
+        assert not server.mainloop_task.cancelled()
     yield from asyncio.sleep(0.1)
     assert not server.is_running
     assert device.connect.call_count == 1
     assert device.connect.called_with()
     assert device.mainloop.called
+    assert server.mainloop_task.cancelled()

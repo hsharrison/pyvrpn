@@ -371,8 +371,8 @@ class LocalServer(Server):
             The exit code of the process.
 
         """
+        self.mainloop_task.cancel()
         yield from super().stop(exc_type, exc_value, exc_tb, kill)
-
 
 class _ContextManager:
     # See asyncio.locks._ContextManager.
