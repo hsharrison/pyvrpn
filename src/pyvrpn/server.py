@@ -326,6 +326,15 @@ class LocalServer(Server):
 
     @asyncio.coroutine
     def start(self):
+        """Start the server asynchronously.
+
+        |Server.start| returns after
+        (1) the |sentinel| attribute (if given) is matched in the server's stdout, followed by
+        (2) a number of seconds given by the |sleep| attribute.
+
+        This method is a |coroutine|.
+
+        """
         yield from super().start()
         for device in self.devices:
             device.connect()
@@ -333,6 +342,35 @@ class LocalServer(Server):
 
     @asyncio.coroutine
     def stop(self, exc_type=None, exc_value=None, exc_tb=None, kill=False):
+        """Stop the server asynchronously.
+
+        The monitoring tasks stored in |Server.monitor_tasks| will be canceled,
+        then a SIGTERM or SIGKILL signal will be sent to the server process.
+
+        The first three inputs are the same as used for a context manager's |__exit__| method,
+        and provide information about an exception.
+        If the server is being stopped due to an exception,
+        information about the exception can be passed in and it will be logged before killing the process.
+
+        This method is a |coroutine|.
+
+        Parameters
+        ----------
+        exc_type : type, optional
+            The exception type, if the server is being stopped due to an exception.
+        exc_value : str, optional
+            The value passed to the exception.
+        exc_tb : |traceback|, optional
+            The exception traceback.
+        kill : bool, optional
+            If True, send SIGKILL instead of SIGTERM.
+
+        Returns
+        -------
+        int
+            The exit code of the process.
+
+        """
         yield from super().stop(exc_type, exc_value, exc_tb, kill)
 
 
