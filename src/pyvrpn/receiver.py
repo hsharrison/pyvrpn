@@ -12,26 +12,26 @@ error, warning, info, debug = setup_module_logging(__name__)
 class Receiver(pyglet.event.EventDispatcher, metaclass=abc.ABCMeta):
     """VRPN receiver.
 
-    A pyglet EventDispatcher representing one VRPN receiver device.
+    A |pyglet.event.EventDispatcher| representing one VRPN receiver device.
     A metaclass, it must be subclassed to be used.
     Subclasses should override:
-      - device_type, the name of the device as recognized by the server config file (e.g. 'vrpn_Tracker_NULL').
-      - object_class, the class from vrpn.receiver to instantiate the receiver (e.g., vrpn.receiver.Tracker).
-      - n_sensors, if sensor-specific callbacks are desired (only works for vrpn.receiver.Tracker devices).
-      - extend_config_line_with_backslash,
+      - |device_type|, the name of the device as recognized by the server config file (e.g. ``'vrpn_Tracker_NULL'``).
+      - |object_class|, the class from vrpn.receiver to instantiate the receiver (e.g., ``vrpn.receiver.Tracker``).
+      - |n_sensors|, if sensor-specific callbacks are desired (only works for ``vrpn.receiver.Tracker`` devices).
+      - |extend_config_line_with_backslash|,
         set to True if additional lines in the config file need to be separated with a backslash.
-    Subclasses should also document the required arguments (config_args).
-    Once instantiated, use EventDispatcher methods to set handlers for the 'on_input' event.
+    Subclasses should also document the required arguments (`config_args`).
+    Once instantiated, use |EventDispatcher| methods to set handlers for the ``'on_input'`` event.
     This event fires whenever new data is received from the tracker.
     Handler functions should take a single parameter, taking raw data from the tracker in the form of a dictionary.
-    To set sensor-specific callbacks, add handlers to the individual sensors (also EventDispatchers).
-    Individual sensors can be access via indexing the Receiver object.
+    To set sensor-specific callbacks, add handlers to the individual sensors (each also an |EventDispatcher|).
+    Individual sensors can be access via indexing the |Receiver| object.
 
     Parameters
     ----------
     config_args : varies
         The sequence of arguments needed to define this device in the server configuration file.
-        See the sample vrpn.cfg to determine these arguments.
+        See the sample ``vrpn.cfg`` to determine these arguments.
     additional_config_lines : list of str, optional
         Additional lines to write to the configuration file.
         For example, commands to send to the device.
@@ -47,7 +47,7 @@ class Receiver(pyglet.event.EventDispatcher, metaclass=abc.ABCMeta):
     device_type : str
         The name of the device as recognized by the server configuration file.
     object_class : type
-        The class from vrpn.receiver to instantiate the device.
+        The class from ``vrpn.receiver`` to instantiate the device.
     config_text : str
         The server configuration file entry for this device.
     callback_type : str
@@ -78,10 +78,10 @@ class Receiver(pyglet.event.EventDispatcher, metaclass=abc.ABCMeta):
     @property
     def n_sensors(self):
         """
-        Used only by vrpn.receiver.Tracker.
+        Used only by |vrpn.receiver.Tracker| receivers.
         Can be provided by subclasses.
-        If specified, event handlers will be created for individual sensors (Sensor objects),
-        *in addition to* an event handler for the entire tracker (this Receiver object).
+        If specified, event handlers will be created for individual sensors (|Sensor| objects),
+        *in addition to* an event handler for the entire tracker (this |Receiver| object).
 
         """
         return 0
@@ -89,9 +89,10 @@ class Receiver(pyglet.event.EventDispatcher, metaclass=abc.ABCMeta):
     @property
     def callback_type(self):
         """
-        A required parameter for vrpn.receiver.Tracker.register_change_handler.
-        Valid options are {'position', 'velocity', 'acceleration', 'workspace', 'unit2sensor', 'tracker2room'}.
-        From limited testing (only with Polhemus Liberty Latus), if 'position' is used all tracker data is received.
+        A required parameter for ``vrpn.receiver.Tracker.register_change_handler``.
+        Valid options are ``{'position', 'velocity', 'acceleration', 'workspace', 'unit2sensor', 'tracker2room'}``.
+        From limited testing (only with Polhemus Liberty Latus),
+        if ``'position'`` is used all tracker data is received.
 
         """
         if self.object_class is vrpn.receiver.Tracker:
@@ -155,11 +156,11 @@ class Receiver(pyglet.event.EventDispatcher, metaclass=abc.ABCMeta):
 class Sensor(pyglet.event.EventDispatcher):
     """VRPN sensor.
 
-    A pyglet EventDispatcher associated with an individual sensor of a tracker.
-    Use EventDispatcher methods to register handlers for the 'on_input' event.
+    A |pyglet.event.EventDispatcher| associated with an individual sensor of a tracker.
+    Use |EventDispatcher| methods to register handlers for the ``'on_input'`` event.
     These handlers should take a single argument, raw data from the tracker as a dictionary.
 
-    Sensors should not be directly instantiated, they will be automatically created by the parent Receiver.
+    Sensors should not be directly instantiated, they will be automatically created by the parent |Receiver|.
 
     Attributes
     ----------
@@ -179,8 +180,8 @@ class Sensor(pyglet.event.EventDispatcher):
 
 
 class Tracker(Receiver):
-    """Tracker receivers can derive from this instead of Receiver, and then don't have to override object_class.
-    This also provides a best-guess for n_sensors, specifically the first config argument.
+    """Tracker receivers can derive from this instead of |Receiver|, and then don't have to override |object_class|.
+    This also provides a best-guess for |n_sensors|, specifically the first config argument.
 
     """
     object_class = vrpn.receiver.Tracker
@@ -191,22 +192,22 @@ class Tracker(Receiver):
 
 
 class Dial(Receiver):
-    """Dial receivers can derive from this instead of Receiver, and then don't have to override object_class."""
+    """Dial receivers can derive from this instead of |Receiver|, and then don't have to override |object_class|."""
     object_class = vrpn.receiver.Dial
 
 
 class Button(Receiver):
-    """Button receivers can derive from this instead of Receiver, and then don't have to override object_class."""
+    """Button receivers can derive from this instead of |Receiver|, and then don't have to override |object_class|."""
     object_class = vrpn.receiver.Button
 
 
 class Analog(Receiver):
-    """Analog receivers can derive from this instead of Receiver, and then don't have to override object_class."""
+    """Analog receivers can derive from this instead of |Receiver|, and then don't have to override |object_class|."""
     object_class = vrpn.receiver.Analog
 
 
 class Text(Receiver):
-    """Text receivers can derive from this instead of Receiver, and then don't have to override object_class."""
+    """Text receivers can derive from this instead of |Receiver|, and then don't have to override |object_class|."""
     object_class = vrpn.receiver.Text
 
 
