@@ -2,6 +2,7 @@ import asyncio
 import functools
 import logging
 from datetime import datetime
+from unittest.mock import MagicMock
 
 import pytest
 
@@ -10,7 +11,7 @@ try:
 except ImportError:
     import toolz
 
-from pyvrpn.server import monitor_feed, Server, decoded_readline
+from pyvrpn.server import monitor_feed, Server, LocalServer, decoded_readline
 
 
 # Set up logging to file in case something hangs and we have to Ctrl-C.
@@ -181,3 +182,18 @@ def test_bad_server_stop(loop):
     server = Server([], loop=loop)
     with pytest.raises(RuntimeError):
         yield from server.stop()
+
+
+@async_test
+def test_local_server(loop):
+    device = MagicMock()
+    device.is_connected = True
+    device.config_text = 'vrpn_Tracker_NULL Tracker0 2 2.0'
+    with (yield from LocalServer([device])) as server:
+        yield from asyncio.sleep(0.25)
+        assert server.is_running
+    yield from asyncio.sleep(0.1)
+    assert not server.is_running
+    assert device.connect.call_count == 1
+    assert device.connect.called_with()
+    assert device.mainloop.called
