@@ -304,6 +304,12 @@ class LocalServer(Server):
     kwargs
         Optional keyword arguments to pass to |Server|.
 
+    Attributes
+    ----------
+    devices : sequence of |Receiver|
+    mainloop_task : |asyncio.Task|
+        The task that runs the |mainloop| method of the managed `devices`.
+
     """
     def __init__(self, devices, **kwargs):
         super().__init__((device.config_text for device in devices), **kwargs)
