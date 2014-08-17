@@ -148,9 +148,11 @@ class Receiver(pyglet.event.EventDispatcher, metaclass=abc.ABCMeta):
         # Manually dispatch sensor events for non-trackers.
         if self.n_sensors:
             if 'button' in data:
-                self[data['button']].dispatch_event('on_input')
+                self[data['button']].dispatch_event('on_input', data)
+                debug('dispatched on_input event for {}'.format(self[data['button']]))
             elif 'dial' in data:
-                self[data['dial']].dispatch_event('on_input')
+                self[data['dial']].dispatch_event('on_input', data)
+                debug('dispatched on_input event for {}'.format(self[data['dial']]))
 
     def __str__(self):
         return '{} {} ({})'.format(self.device_type, self.name, type(self).__name__)
@@ -192,6 +194,7 @@ class Sensor(pyglet.event.EventDispatcher):
 
     def _callback(self, user_data, data):
         self.dispatch_event('on_input', data)
+        debug('dispatched on_input event for {}'.format(self))
 
     def __str__(self):
         return 'Sensor #{} of {}'.format(self.number, self._parent_str)
