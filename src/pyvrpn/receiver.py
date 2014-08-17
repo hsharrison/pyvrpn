@@ -107,7 +107,7 @@ class Receiver(pyglet.event.EventDispatcher, metaclass=abc.ABCMeta):
         lines.extend(self.additional_config_lines)
 
         joiner = '\\\n' if self.extend_config_line_with_backslash else '\n'
-        return joiner.join(lines)
+        return joiner.join(lines) + '\n'
 
     def connect(self, host='localhost'):
         """
@@ -144,6 +144,7 @@ class Receiver(pyglet.event.EventDispatcher, metaclass=abc.ABCMeta):
 
     def _callback(self, user_data, data):
         self.dispatch_event('on_input', data)
+        debug('dispatched on_input event for {}'.format(self))
         # Manually dispatch sensor events for non-trackers.
         if self.n_sensors:
             if 'button' in data:
