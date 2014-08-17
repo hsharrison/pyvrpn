@@ -18,7 +18,7 @@ from pyvrpn.server import monitor_feed, Server, LocalServer, decoded_readline
 logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s %(name)-13s %(lineno)-4s %(levelname)-6s %(message)s',
                     datefmt='%m-%d %H:%M',
-                    filename='test.log',
+                    filename='test_server.log',
                     filemode='w')
 
 
