@@ -61,7 +61,7 @@ class Receiver(pyglet.event.EventDispatcher, metaclass=abc.ABCMeta):
         self.additional_config_lines = additional_config_lines or []
         self.name = uuid4().hex
         self._object = None
-        self.connected = False
+        self.is_connected = False
 
         self._sensors = [Sensor(str(self), ix) for ix in range(self.n_sensors)]
 
@@ -120,7 +120,7 @@ class Receiver(pyglet.event.EventDispatcher, metaclass=abc.ABCMeta):
             Defaults to ``'localhost'``.
 
         """
-        if self.connected:
+        if self.is_connected:
             raise RuntimeError('cannot connect a Receiver twice')
 
         self._object = self.object_class('{}@{}'.format(self.name, host))
@@ -136,7 +136,7 @@ class Receiver(pyglet.event.EventDispatcher, metaclass=abc.ABCMeta):
             self._object.register_change_handler('', self._callback)
 
         info('{} connected to server'.format(self))
-        self.connected = True
+        self.is_connected = True
 
     def mainloop(self):
         """Call this method regularly to ensure that data is received promptly."""
