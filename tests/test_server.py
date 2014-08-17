@@ -189,7 +189,10 @@ def test_local_server(loop):
     device = MagicMock()
     device.is_connected = True
     device.config_text = 'vrpn_Tracker_NULL Tracker0 2 2.0'
-    with (yield from LocalServer([device])) as server:
+    device2 = MagicMock()
+    device2.is_connected = True
+    device2.config_text = 'vrpn_Button_Example Button0 2 2.0'
+    with (yield from LocalServer([device, device2])) as server:
         yield from asyncio.sleep(0.25)
         assert server.is_running
         assert not server.mainloop_task.cancelled()
@@ -199,3 +202,6 @@ def test_local_server(loop):
     assert device.connect.called_with()
     assert device.mainloop.called
     assert server.mainloop_task.cancelled()
+    assert device2.connect.call_count == 1
+    assert device2.connect.called_with()
+    assert device2.mainloop.called
