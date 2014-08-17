@@ -193,16 +193,21 @@ class Sensor(pyglet.event.EventDispatcher):
         return True
 
 
-class Tracker(Receiver):
-    """Tracker receivers can derive from this instead of |Receiver|, and then don't have to override |object_class|.
-    This also provides a best-guess for |n_sensors|, specifically the first config argument.
+class FirstArgumentIsNSensors(Receiver):
+    """
+    A mixin class to use when the first config argument specifies the number of sensors.
 
     """
-    object_class = vrpn.receiver.Tracker
-
     @property
     def n_sensors(self):
         return self.config_args[0]
+
+
+class Tracker(Receiver):
+    """Tracker receivers can derive from this instead of |Receiver|, and then don't have to override |object_class|.
+
+    """
+    object_class = vrpn.receiver.Tracker
 
 
 class Dial(Receiver):
