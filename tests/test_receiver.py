@@ -56,7 +56,6 @@ def test_test_devices(loop):
     dial[1].set_handler('on_input', count(counts, 'dial[1]'))
     with (yield from server.LocalServer(devices)):
         yield from asyncio.sleep(1)
-    print(counts)
     assert counts['tracker[0]'] in (1, 2)
     assert counts['tracker[1]'] in (1, 2)
     assert counts['tracker'] == counts['tracker[0]'] + counts['tracker[1]']
