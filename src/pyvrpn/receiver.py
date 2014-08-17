@@ -230,7 +230,54 @@ class Text(Receiver):
     object_class = vrpn.receiver.Text
 
 
-class PolhemusLibertyLatus(Tracker):
+class TestTracker(Tracker, FirstArgumentIsNSensors):
+    """
+    Reports identity information for each of its sensors at a specified rate.
+
+    Parameters
+    ----------
+    n_sensors : int
+        Number of sensors to report.
+    rate_at_which_to_report_updates : float
+        Rate, in Hz, at which data is reported.
+
+    """
+    device_type = 'vrpn_Tracker_NULL'
+
+
+class TestButton(Button, FirstArgumentIsNSensors):
+    """
+    Reports on and off events for each of its buttons at a specified rate.
+
+    Parameters
+    ----------
+    n_buttons : int
+        Number of buttons to report.
+    rate_at_which_buttons_toggle : float
+        Rate, in Hz, at which data is reported.
+
+    """
+    device_type = 'vrpn_Button_Example'
+
+
+class TestDial(Dial, FirstArgumentIsNSensors):
+    """
+    Reports constant rotations for each of its dials at the specified rate.
+
+    Parameters
+    ----------
+    n_dials : int
+        Number of dials to report
+    rate_at_which_dials_spin : float
+        Rate to spin the dials, in revolutions per second.
+    rate_at_which_to_report_updates : float
+        Rate, in Hz, at which data is reported.
+
+    """
+    device_type = 'vrpn_Dial_Example'
+
+
+class PolhemusLibertyLatus(Tracker, FirstArgumentIsNSensors):
     """Polhemus Liberty Latus high-speed tracker.
 
     Parameters
