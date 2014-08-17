@@ -144,6 +144,12 @@ class Receiver(pyglet.event.EventDispatcher, metaclass=abc.ABCMeta):
 
     def _callback(self, user_data, data):
         self.dispatch_event('on_input', data)
+        # Manually dispatch sensor events for non-trackers.
+        if self.n_sensors:
+            if 'button' in data:
+                self[data['button']].dispatch_event('on_input')
+            elif 'dial' in data:
+                self[data['dial']].dispatch_event('on_input')
 
     def __str__(self):
         return '{} {} ({})'.format(self.device_type, self.name, type(self).__name__)
@@ -195,8 +201,7 @@ class Sensor(pyglet.event.EventDispatcher):
 
 class FirstArgumentIsNSensors(Receiver):
     """
-    A mixin class to use when the first config argument specifies the number of sensors.
-    Only works with trackers.
+    A mixin class to use when the first config argument specifies the number of sensors/buttons/dials.
 
     """
     @property
@@ -246,7 +251,7 @@ class TestTracker(Tracker, FirstArgumentIsNSensors):
     device_type = 'vrpn_Tracker_NULL'
 
 
-class TestButton(Button):
+class TestButton(Button, FirstArgumentIsNSensors):
     """
     Reports on and off events for each of its buttons at a specified rate.
 
@@ -261,7 +266,7 @@ class TestButton(Button):
     device_type = 'vrpn_Button_Example'
 
 
-class TestDial(Dial):
+class TestDial(Dial, FirstArgumentIsNSensors):
     """
     Reports constant rotations for each of its dials at the specified rate.
 
