@@ -30,7 +30,7 @@ nosetests.xml
 htmlcov
 
 # Test log
-test.log
+*.log
 
 # Translations
 *.mo
