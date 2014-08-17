@@ -196,6 +196,7 @@ class Sensor(pyglet.event.EventDispatcher):
 class FirstArgumentIsNSensors(Receiver):
     """
     A mixin class to use when the first config argument specifies the number of sensors.
+    Only works with trackers.
 
     """
     @property
@@ -245,7 +246,7 @@ class TestTracker(Tracker, FirstArgumentIsNSensors):
     device_type = 'vrpn_Tracker_NULL'
 
 
-class TestButton(Button, FirstArgumentIsNSensors):
+class TestButton(Button):
     """
     Reports on and off events for each of its buttons at a specified rate.
 
@@ -260,7 +261,7 @@ class TestButton(Button, FirstArgumentIsNSensors):
     device_type = 'vrpn_Button_Example'
 
 
-class TestDial(Dial, FirstArgumentIsNSensors):
+class TestDial(Dial):
     """
     Reports constant rotations for each of its dials at the specified rate.
 
