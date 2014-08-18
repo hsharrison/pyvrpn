@@ -90,3 +90,40 @@ intersphinx_mapping = {
     'pandas': ('http://pandas.pydata.org/pandas-docs/stable/', None),
     'scipy': ('http://docs.scipy.org/doc/scipy/reference/', None),
 }
+
+rst_epilog = """
+
+.. |asyncio.EventLoop| replace:: :class:`asyncio.EventLoop`
+.. |asyncio.subprocess.Process| replace:: :class:`asyncio.subprocess.Process`
+.. |asyncio.Task| replace:: :class:`asyncio.Task`
+.. |coroutine| replace:: :func:`~asyncio.coroutine`
+.. |asyncio.StreamReader| replace:: :class:`asyncio.StreamReader`
+.. |asyncio| replace:: :mod:`asyncio`
+.. |__exit__| replace:: :ref:`__exit__ <typecontextmanager>`
+.. |traceback| replace:: :ref:`traceback`
+.. |StopIteration| replace:: :class:`StopIteration`
+
+.. |pyglet.event.EventDispatcher| replace:: :class:`pyglet.event.EventDispatcher`
+.. |EventDispatcher| replace:: :class:`~pyglet.event.EventDispatcher`
+
+.. |proc| replace:: :attr:`~pyvrpn.Server.proc`
+.. |started_at| replace:: :attr:`~pyvrpn.Server.started_at`
+.. |Server.start| replace:: :meth:`Server.start <pyvrpn.Server.start>`
+.. |sentinel| replace:: :attr:`~pyvrpn.Server.sentinel`
+.. |monitor_tasks| replace:: :attr:`~pyvrpn.Server.monitor_tasks`
+.. |sleep| replace:: :attr:`~pyvrpn.Server.sleep`
+.. |LocalServer| replace:: :class:`~pyvrpn.LocalServer`
+.. |LocalServer.start| replace:: :meth:`LocalServer.start <pyvrpn.LocalServer.start>`
+
+.. |device_type| replace:: :attr:`~pyvrpn.receiver.Receiver.device_type`
+.. |object_class| replace:: :attr:`~pyvrpn.receiver.Receiver.object_class`
+.. |n_sensors| replace:: :attr:`~pyvrpn.receiver.Receiver.n_sensors`
+.. |extend_config_line_with_backslash| replace:: :attr:`~pyvrpn.receiver.Receiver.extend_config_line_with_backslash`
+.. |mainloop| replace:: :meth:`~pyvprn.receiver.Receiver.mainloop`
+
+.. |vrpn.receiver.Tracker| replace:: :class:`vrpn.receiver.Tracker`
+
+.. |Sensor| replace:: :class:`~pyvrpn.receiver.Sensor`
+.. |Receiver| replace:: :class:`~pyvrpn.receiver.Receiver`
+
+"""

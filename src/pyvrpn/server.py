@@ -86,11 +86,11 @@ class Server:
     started_at : |datetime.datetime|
         The time when the server completed initialization.
     monitor_tasks : dict of str to |asyncio.Task|
-        Contains two tasks, one that monitors the stdout of `proc` and one that monitors its stderr.
+        Contains two tasks, one that monitors the stdout of |proc| and one that monitors its stderr.
     is_running : bool
         Returns True if the server is running.
     time : float
-        Number of seconds since `started_at`.
+        Number of seconds since |started_at|.
 
     Notes
     -----
@@ -331,7 +331,7 @@ class LocalServer(Server):
     def start(self):
         """Start the server asynchronously.
 
-        |Server.start| returns after
+        |LocalServer.start| returns after
         (1) the |sentinel| attribute (if given) is matched in the server's stdout, followed by
         (2) a number of seconds given by the |sleep| attribute.
 
