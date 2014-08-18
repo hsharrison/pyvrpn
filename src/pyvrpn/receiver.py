@@ -8,6 +8,13 @@ from pyvrpn.logging import setup_module_logging
 
 error, warning, info, debug = setup_module_logging(__name__)
 
+__all__ = [
+    'TestTracker',
+    'TestButton',
+    'TestDial',
+    'PolhemusLibertyLatus',
+]
+
 
 class Receiver(pyglet.event.EventDispatcher, metaclass=abc.ABCMeta):
     """VRPN receiver.

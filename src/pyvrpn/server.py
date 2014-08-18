@@ -14,9 +14,12 @@ except ImportError:
 
 from pyvrpn.logging import setup_module_logging
 
+__all__ = [
+    'Server',
+    'LocalServer',
+]
 
 SERVER_CMD_ARGS = ['vrpn_server', '-f']
-
 
 error, warning, info, debug = setup_module_logging(__name__)
 
