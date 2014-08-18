@@ -42,6 +42,7 @@ def count(data_store, key, data):
 @async_test
 def test_test_devices(loop):
     tracker = receiver.TestTracker(2, 1)
+    assert len(tracker) == 2
     button = receiver.TestButton(2, 2)
     dial = receiver.TestDial(2, 1, 2)
     counts = Counter()
