@@ -66,3 +66,11 @@ def test_test_devices(loop):
     assert counts['dial[0]'] in (1, 2)
     assert counts['dial[1]'] in (1, 2)
     assert counts['dial'] == counts['dial[0]'] + counts['dial[1]']
+
+
+@async_test
+def test_connect_twice(loop):
+    tracker = receiver.TestTracker(1, 1)
+    with (yield from server.LocalServer([tracker])):
+        with pytest.raises(RuntimeError):
+            tracker.connect()
