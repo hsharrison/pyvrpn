@@ -1,16 +1,10 @@
-import asyncio
-import functools
-from collections import Counter
 import logging
+from unittest.mock import MagicMock
 
 import pytest
+import vrpn
 
-try:
-    import cytoolz as toolz
-except ImportError:
-    import toolz
-
-from pyvrpn import receiver, server
+from pyvrpn import receiver
 
 
 # Set up logging to file in case something hangs and we have to Ctrl-C.
@@ -21,56 +15,81 @@ logging.basicConfig(level=logging.DEBUG,
                     filemode='w')
 
 
-@pytest.fixture
-def loop():
-    return asyncio.get_event_loop()
+def test_object_classes():
+    assert receiver.TestTracker.object_class is vrpn.receiver.Tracker
+    assert receiver.TestButton.object_class is vrpn.receiver.Button
+    assert receiver.TestDial.object_class is vrpn.receiver.Dial
+    assert receiver.PolhemusLibertyLatus.object_class is vrpn.receiver.Tracker
 
 
-def async_test(func):
-    @functools.wraps(func)
-    def wrapper(loop, *args, **kwargs):
-        coro = asyncio.coroutine(func)
-        loop.run_until_complete(coro(loop, *args, **kwargs))
-    return wrapper
+def test_device_type():
+    assert receiver.TestTracker.device_type == 'vrpn_Tracker_NULL'
+    assert receiver.TestButton.device_type == 'vrpn_Button_Example'
+    assert receiver.TestDial.device_type == 'vrpn_Dial_Example'
+    assert receiver.PolhemusLibertyLatus.device_type == 'vrpn_Tracker_LibertyHS'
 
 
-@toolz.curry
-def count(data_store, key, data):
-    data_store[key] += 1
+def test_event_types():
+    assert receiver.Receiver.event_types == ['on_input']
+    assert receiver.Sensor.event_types == ['on_input']
 
 
-@async_test
-def test_test_devices(loop):
+def test_callback_type():
+    assert receiver.TestTracker(1, 1).callback_type == receiver.PolhemusLibertyLatus(1).callback_type == 'position'
+    assert receiver.TestButton(1, 1).callback_type is None
+
+
+def test_sensors():
     tracker = receiver.TestTracker(2, 1)
-    assert len(tracker) == 2
-    button = receiver.TestButton(2, 2)
-    dial = receiver.TestDial(2, 1, 2)
-    counts = Counter()
-    devices = [tracker, button, dial]
-    for device, key in zip(devices, ['tracker', 'button', 'dial']):
-        device.set_handler('on_input', count(counts, key))
-    tracker[0].set_handler('on_input', count(counts, 'tracker[0]'))
-    tracker[1].set_handler('on_input', count(counts, 'tracker[1]'))
-    button[0].set_handler('on_input', count(counts, 'button[0]'))
-    button[1].set_handler('on_input', count(counts, 'button[1]'))
-    dial[0].set_handler('on_input', count(counts, 'dial[0]'))
-    dial[1].set_handler('on_input', count(counts, 'dial[1]'))
-    with (yield from server.LocalServer(devices)):
-        yield from asyncio.sleep(1)
-    assert counts['tracker[0]'] in (1, 2)
-    assert counts['tracker[1]'] in (1, 2)
-    assert counts['tracker'] == counts['tracker[0]'] + counts['tracker[1]']
-    assert counts['button[0]'] in (1, 2)
-    assert counts['button[1]'] in (1, 2)
-    assert counts['button'] == counts['button[0]'] + counts['button[1]']
-    assert counts['dial[0]'] in (1, 2)
-    assert counts['dial[1]'] in (1, 2)
-    assert counts['dial'] == counts['dial[0]'] + counts['dial[1]']
+    assert tracker
+    assert tracker[0]
+    assert tracker[1]
+    assert tracker.n_sensors == len(tracker) == tracker.config_args[0] == 2
+    assert isinstance(tracker[0], receiver.Sensor)
+    assert isinstance(tracker[1], receiver.Sensor)
+    button = receiver.TestButton(2, 1)
+    assert button.n_sensors == len(button) == button.config_args[0] == 2
+    assert isinstance(button[0], receiver.Sensor)
+    assert isinstance(button[1], receiver.Sensor)
+    dial = receiver.TestDial(2, 1, 1)
+    assert dial.n_sensors == len(dial) == dial.config_args[0] == 2
+    assert isinstance(dial[0], receiver.Sensor)
+    assert isinstance(dial[1], receiver.Sensor)
+    tracker = receiver.PolhemusLibertyLatus(2)
+    assert tracker.n_sensors == len(tracker) == tracker.config_args[0] == 2
+    assert isinstance(tracker[0], receiver.Sensor)
+    assert isinstance(tracker[1], receiver.Sensor)
+    assert list(tracker) == [tracker[0], tracker[1]]
+    assert list(reversed(tracker)) == [tracker[1], tracker[0]]
 
 
-@async_test
-def test_connect_twice(loop):
-    tracker = receiver.TestTracker(1, 1)
-    with (yield from server.LocalServer([tracker])):
-        with pytest.raises(RuntimeError):
-            tracker.connect()
+def test_config_text():
+    tracker = receiver.TestTracker(1, 1.0)
+    config_fields = tracker.config_text.split()
+    assert config_fields[0] == 'vrpn_Tracker_NULL'
+    assert config_fields[1] == tracker.name
+    assert config_fields[2] == '1'
+    assert config_fields[3] == '1.0'
+
+
+def test_connect():
+    button = receiver.TestButton(2, 1.0)
+    assert not button.is_connected
+    button.object_class = MagicMock()
+    button.connect()
+    assert button.is_connected
+    assert button.object_class.called_with('{}@localhost'.format(button.name))
+    assert button._object.register_change_handler.called_with('', button._callback)
+
+    tracker = receiver.TestTracker(2, 1.0)
+    assert not tracker.is_connected
+    tracker.object_class = MagicMock()
+    tracker.connect()
+    assert tracker.is_connected
+    assert tracker.object_class.called_with('{}@localhost'.format(tracker.name))
+    assert tracker._object.register_change_handler.called_with(
+        '', tracker[-1]._callback, 'position', len(tracker)
+    )
+    with pytest.raises(RuntimeError):
+        tracker.connect()
+
