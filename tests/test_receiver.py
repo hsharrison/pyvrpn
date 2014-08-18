@@ -9,7 +9,7 @@ from pyvrpn import receiver
 
 # Set up logging to file in case something hangs and we have to Ctrl-C.
 logging.basicConfig(level=logging.DEBUG,
-                    format='%(asctime)s %(name)-13s %(lineno)-4s %(levelname)-6s %(message)s',
+                    format='%(asctime)s %(name)-15s %(lineno)-4s %(levelname)-6s %(message)s',
                     datefmt='%m-%d %H:%M',
                     filename='test_receiver.log',
                     filemode='w')

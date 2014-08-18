@@ -16,7 +16,7 @@ from pyvrpn.server import monitor_feed, Server, LocalServer, decoded_readline
 
 # Set up logging to file in case something hangs and we have to Ctrl-C.
 logging.basicConfig(level=logging.DEBUG,
-                    format='%(asctime)s %(name)-13s %(lineno)-4s %(levelname)-6s %(message)s',
+                    format='%(asctime)s %(name)-15s %(lineno)-4s %(levelname)-6s %(message)s',
                     datefmt='%m-%d %H:%M',
                     filename='test_server.log',
                     filemode='w')
