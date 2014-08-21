@@ -164,6 +164,9 @@ class Receiver(pyglet.event.EventDispatcher, metaclass=abc.ABCMeta):
     def __str__(self):
         return '{} {} ({})'.format(self.device_type, self.uuid, type(self).__name__)
 
+    def __eq__(self, other):
+        return isinstance(other, type(self)) and self.uuid == other.uuid
+
     def __bool__(self):
         return True
 

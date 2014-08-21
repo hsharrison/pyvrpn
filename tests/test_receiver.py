@@ -93,3 +93,9 @@ def test_connect():
     with pytest.raises(RuntimeError):
         tracker.connect()
 
+
+def test_equality():
+    tracker = receiver.TestTracker(1, 1)
+    assert tracker != 1
+    assert tracker == tracker
+    assert tracker != receiver.TestTracker(1, 1)
