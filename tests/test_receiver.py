@@ -67,7 +67,7 @@ def test_config_text():
     tracker = receiver.TestTracker(1, 1.0)
     config_fields = tracker.config_text.split()
     assert config_fields[0] == 'vrpn_Tracker_NULL'
-    assert config_fields[1] == tracker.name
+    assert config_fields[1] == tracker.uuid
     assert config_fields[2] == '1'
     assert config_fields[3] == '1.0'
 
@@ -78,7 +78,7 @@ def test_connect():
     button.object_class = MagicMock()
     button.connect()
     assert button.is_connected
-    assert button.object_class.called_with('{}@localhost'.format(button.name))
+    assert button.object_class.called_with('{}@localhost'.format(button.uuid))
     assert button._object.register_change_handler.called_with('', button._callback)
 
     tracker = receiver.TestTracker(2, 1.0)
@@ -86,7 +86,7 @@ def test_connect():
     tracker.object_class = MagicMock()
     tracker.connect()
     assert tracker.is_connected
-    assert tracker.object_class.called_with('{}@localhost'.format(tracker.name))
+    assert tracker.object_class.called_with('{}@localhost'.format(tracker.uuid))
     assert tracker._object.register_change_handler.called_with(
         '', tracker[-1]._callback, 'position', len(tracker)
     )

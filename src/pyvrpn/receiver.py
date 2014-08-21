@@ -1,5 +1,5 @@
 import abc
-from uuid import uuid4
+from uuid import uuid1
 
 import vrpn
 import pyglet
@@ -47,8 +47,8 @@ class Receiver(pyglet.event.EventDispatcher, metaclass=abc.ABCMeta):
     ----------
     config_args : varies
     additional_config_lines : list of str
-    name : str
-        A uniquely identifying name, generated randomly.
+    uuid : str
+        A usually unique identifier.
     connected : bool
         True if the Receiver has already been connected to a server.
     device_type : str
@@ -66,7 +66,7 @@ class Receiver(pyglet.event.EventDispatcher, metaclass=abc.ABCMeta):
     def __init__(self, *config_args, additional_config_lines=None):
         self.config_args = config_args
         self.additional_config_lines = additional_config_lines or []
-        self.name = uuid4().hex
+        self.uuid = str(uuid1())
         self._object = None
         self.is_connected = False
 
@@ -107,7 +107,7 @@ class Receiver(pyglet.event.EventDispatcher, metaclass=abc.ABCMeta):
 
     @property
     def config_text(self):
-        first_line_items = [self.device_type, self.name]
+        first_line_items = [self.device_type, self.uuid]
         first_line_items.extend(str(arg) for arg in self.config_args)
 
         lines = ['\t'.join(first_line_items)]
@@ -130,7 +130,7 @@ class Receiver(pyglet.event.EventDispatcher, metaclass=abc.ABCMeta):
         if self.is_connected:
             raise RuntimeError('cannot connect a Receiver twice')
 
-        self._object = self.object_class('{}@{}'.format(self.name, host))
+        self._object = self.object_class('{}@{}'.format(self.uuid, host))
 
         if self.callback_type:
             # First option to register_change_handler is user_data, which we don't use.
@@ -162,7 +162,7 @@ class Receiver(pyglet.event.EventDispatcher, metaclass=abc.ABCMeta):
                 debug('dispatched on_input event for {}'.format(self[data['dial']]))
 
     def __str__(self):
-        return '{} {} ({})'.format(self.device_type, self.name, type(self).__name__)
+        return '{} {} ({})'.format(self.device_type, self.uuid, type(self).__name__)
 
     def __bool__(self):
         return True
